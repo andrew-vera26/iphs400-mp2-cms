@@ -45,3 +45,14 @@ admin console never goes on the public internet.
 - Decisions and gotchas discovered in conversation go into the handoff or an ADR under `docs/adr/`, never only in chat.
 - When compacting, preserve: the goal, the ordered next steps, every decision with its reason, the modified files and their state, the exact test and lint commands with their last results, and the open questions. Drop raw tool output and resolved detours.
 <!-- /ai-swe-setup:long-sessions -->
+
+## Agent skills
+
+### Issue tracker
+GitHub Issues via the `gh` CLI (PRs are not a triage surface). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+Default five-label vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+Single-context: root `CONTEXT.md` + `docs/adr/`. See `docs/agents/domain.md`.
