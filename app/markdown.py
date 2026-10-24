@@ -66,7 +66,7 @@ def render_body(body: str, image_urls: Collection[str] = ()) -> str:
     """The sanitized HTML for a Markdown Body.
 
     Links survive only if relative. Images survive only if their source is one
-    of `image_urls` (the Recap's own uploaded Images; none exist yet). A removed
+    of `image_urls` (the Recap's own uploaded Images, as `images/<file>`). A removed
     link keeps its text; a removed image leaves nothing. Raw HTML in the Body is
     removed whole: a raw block disappears, a raw inline tag disappears and the
     Markdown text around it stays.
@@ -84,3 +84,14 @@ def render_body(body: str, image_urls: Collection[str] = ()) -> str:
                      attributes=ALLOWED_ATTRIBUTES, url_schemes=set(),
                      link_rel=None, attribute_filter=keep)
     return _SRCLESS_IMG.sub("", _BARE_LINK.sub(r"\1", html))
+
+
+_IMG_TAG = re.compile(r"<img\b[^>]*>")
+_ALT = re.compile(r'\balt="([^"]*)"')
+
+
+def images_without_alt(body: str, image_urls: Collection[str] = ()) -> int:
+    """How many of the Body's kept images have blank alt text. Counted on the
+    output of `render_body`, so only images that would be shown count."""
+    return sum(1 for tag in _IMG_TAG.findall(render_body(body, image_urls))
+               if not (m := _ALT.search(tag)) or not m.group(1).strip())

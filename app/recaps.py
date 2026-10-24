@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sqlite3
 
-from app import db
+from app import db, images
 
 
 class RecapLocked(ValueError):
@@ -70,14 +70,18 @@ def list_recaps(owner_id: int | None = None) -> list[sqlite3.Row]:
 def delete_recap(recap_id: int, editor_id: int | None = None) -> None:
     """Delete a Recap. Pass `editor_id` for an Editor: it is deleted only if
     that Editor still owns a Draft, checked in the DELETE itself, else
-    RecapLocked."""
+    RecapLocked. Its Images go with it, files included."""
     with db.connect() as conn:
+        filenames = [row["filename"] for row in conn.execute(
+            "SELECT filename FROM image WHERE recap_id = ?", (recap_id,))]
         cur = conn.execute(
             f"DELETE FROM recap WHERE id = ?"
             f"{_EDITOR_DRAFT_ONLY if editor_id else ''}",
             (recap_id, *((editor_id,) if editor_id else ())))
         if editor_id and cur.rowcount == 0:
             raise RecapLocked(recap_id)
+        conn.execute("DELETE FROM image WHERE recap_id = ?", (recap_id,))
+    images.remove_files(filenames)
 
 
 def create_recap(trip_id: int, owner_id: int, title: str, slug: str, body: str,

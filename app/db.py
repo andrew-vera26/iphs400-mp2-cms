@@ -48,6 +48,16 @@ CREATE TABLE IF NOT EXISTS recap (
     UNIQUE (trip_id, slug)
 );
 
+CREATE TABLE IF NOT EXISTS image (
+    id           INTEGER PRIMARY KEY,
+    recap_id     INTEGER NOT NULL REFERENCES recap (id),
+    filename     TEXT NOT NULL UNIQUE,
+    content_type TEXT NOT NULL,
+    size         INTEGER NOT NULL,
+    alt          TEXT NOT NULL,
+    created_at   TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+);
+
 CREATE TABLE IF NOT EXISTS site_state (
     id                INTEGER PRIMARY KEY CHECK (id = 1),
     last_rendered_at  TEXT

@@ -22,3 +22,6 @@ BASE_PATH = os.environ.get("CMS_BASE_PATH", "")
 # The club's Instagram, linked from every page's footer for discussion. A
 # committed constant, not an environment variable: replace the placeholder.
 INSTAGRAM_URL = "https://www.instagram.com/REPLACE-ME/"
+# Uploaded Recap Images. Gitignored, and outside SITE: only the Images of
+# Published Recaps are copied from here into the output.
+UPLOADS = Path(os.environ.get("CMS_UPLOADS", ROOT / "uploads"))

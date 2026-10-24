@@ -3,12 +3,12 @@ from __future__ import annotations
 
 from typing import Callable
 
-from fastapi import APIRouter, Depends, Form, HTTPException, Request
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
+from fastapi.responses import FileResponse, RedirectResponse
 
-from app import policy, recaps, trips
+from app import images, policy, recaps, settings, trips
 from app.flash import flash
-from app.markdown import render_body
+from app.markdown import images_without_alt, render_body
 from app.accounts import Account
 from app.routes.accounts import CLASS_YEAR, CLASS_YEAR_RANGE
 from app.security import require
@@ -27,6 +27,8 @@ LIVE_NOTICE = ("This Recap is Published, so the change is still live until you "
 LOCKED_ERROR = ("This Recap was Submitted or Published, so it can no longer "
                 "be changed by its Editor.")
 TRANSITION_ERROR = "That change is not allowed for a Recap in its current status."
+ALT_PUBLISH_ERROR = ("This Recap's Body has an image without alt text. Add alt "
+                     "text to every image before it is Published.")
 TITLE_ERROR = "The title cannot be blank."
 SLUG_ERROR = "The Slug cannot be blank."
 SLUG_UNSAFE_ERROR = ("A Slug may only use lowercase letters, digits and single "
@@ -57,13 +59,17 @@ def _available_actions(account: Account, recap) -> list[tuple[str, str]]:
 
 def _form(request: Request, account: Account, values: dict, action: str,
           title: str, error: str | None = None, status_code: int = 200,
-          recap=None, preview_html: str | None = None):
+          recap=None, preview_html: str | None = None,
+          snippet: str | None = None):
     return templates.TemplateResponse(
         request, "admin/recap_form.html",
         {"title": title, "account": account, "values": values,
          "action": action, "trips": trips.list_trips(), "error": error,
          "recap": recap, "status_actions": _available_actions(account, recap),
-         "preview_html": preview_html},
+         "preview_html": preview_html, "snippet": snippet,
+         "images": images.list_images(recap["id"]) if recap else [],
+         "can_edit_images": recap is not None
+         and policy.can(account, "recaps.edit", recap)},
         status_code=status_code)
 
 
@@ -154,14 +160,21 @@ def new_recap(request: Request,
     return _form(request, account, values, "/admin/recaps", "New Recap")
 
 
+def _edit_form(request: Request, account: Account, recap,
+               error: str | None = None, status_code: int = 200,
+               snippet: str | None = None):
+    """The saved Recap's editor, as stored."""
+    values = {k: recap[k] for k in ("trip_id", "title", "slug", "body",
+                                    "byline_name", "byline_class_year")}
+    return _form(request, account, values, f"/admin/recaps/{recap['id']}",
+                 "Edit Recap", error, status_code, recap=recap, snippet=snippet)
+
+
 @router.get("/{recap_id}")
 def edit_recap_form(recap_id: int, request: Request,
                     account: Account = Depends(require("console.view"))):
-    recap = _allowed_recap(recap_id, account, "recaps.view")
-    values = {k: recap[k] for k in ("trip_id", "title", "slug", "body",
-                                    "byline_name", "byline_class_year")}
-    return _form(request, account, values, f"/admin/recaps/{recap_id}",
-                 "Edit Recap", recap=recap)
+    return _edit_form(request, account,
+                      _allowed_recap(recap_id, account, "recaps.view"))
 
 
 def _move(request: Request, recap_id: int, account: Account, action: str, policy_action: str):
@@ -170,6 +183,9 @@ def _move(request: Request, recap_id: int, account: Account, action: str, policy
     recap = _allowed_recap(recap_id, account, policy_action)
     if action == "submit" and not recap["body"].strip():
         raise HTTPException(400, SUBMIT_EMPTY_ERROR)
+    if action == "publish" and images_without_alt(
+            recap["body"], _image_urls(recap_id)):
+        raise HTTPException(400, ALT_PUBLISH_ERROR)
     try:
         recaps.transition(recap_id, action)
     except recaps.TransitionRefused:
@@ -203,6 +219,48 @@ def unpublish_recap(recap_id: int, request: Request,
     return _move(request, recap_id, account, "unpublish", "recaps.unpublish")
 
 
+@router.get("/{recap_id}/images/{filename}")
+def show_image(recap_id: int, filename: str,
+               account: Account = Depends(require("console.view"))):
+    """The console's copy of an Image. Preview's `images/<file>` resolves here."""
+    _allowed_recap(recap_id, account, "recaps.view")
+    image = next((i for i in images.list_images(recap_id)
+                  if i["filename"] == filename), None)
+    path = settings.UPLOADS / filename
+    if image is None or not path.is_file():
+        raise HTTPException(404, "No such Image")
+    return FileResponse(path, media_type=image["content_type"],
+                        headers={"X-Content-Type-Options": "nosniff"})
+
+
+@router.post("/{recap_id}/images")
+def upload_image(recap_id: int, request: Request,
+                 account: Account = Depends(require("console.view")),
+                 file: UploadFile | None = File(None), alt: str = Form("")):
+    recap = _allowed_recap(recap_id, account, "recaps.edit")
+    data = file.file.read(images.MAX_BYTES + 1) if file else None
+    try:
+        image = images.add_image(recap_id, data, alt, _editor_id(account))
+    except images.ImageRefused as refusal:
+        return _edit_form(request, account, recap, str(refusal), 400)
+    if image is None:
+        raise HTTPException(409, LOCKED_ERROR)
+    return _edit_form(request, account, recap,
+                      snippet=images.snippet(image["alt"], image["filename"]))
+
+
+@router.post("/{recap_id}/images/{image_id}/delete")
+def delete_image(recap_id: int, image_id: int,
+                 account: Account = Depends(require("console.view"))):
+    _allowed_recap(recap_id, account, "recaps.edit")
+    image = images.get_image(image_id)
+    if image is None or image["recap_id"] != recap_id:
+        raise HTTPException(404, "No such Image")
+    if not images.delete_image(image_id, recap_id, _editor_id(account)):
+        raise HTTPException(409, LOCKED_ERROR)
+    return RedirectResponse(f"/admin/recaps/{recap_id}", status_code=303)
+
+
 @router.post("/{recap_id}/delete")
 def delete_recap(recap_id: int,
                  account: Account = Depends(require("console.view"))):
@@ -212,6 +270,11 @@ def delete_recap(recap_id: int,
     except recaps.RecapLocked:
         raise HTTPException(409, LOCKED_ERROR)
     return RedirectResponse("/admin/recaps", status_code=303)
+
+
+def _image_urls(recap_id: int) -> set[str]:
+    """The `images/<file>` references a Recap's Body may use."""
+    return {f"images/{i['filename']}" for i in images.list_images(recap_id)}
 
 
 def _form_values(trip_id, title, slug, body, byline_name, byline_class_year):
@@ -243,7 +306,8 @@ def preview_recap(recap_id: int, request: Request,
     values = _form_values(trip_id, title, slug, body, byline_name,
                           byline_class_year)
     return _form(request, account, values, f"/admin/recaps/{recap_id}",
-                 "Edit Recap", recap=recap, preview_html=render_body(body))
+                 "Edit Recap", recap=recap,
+                 preview_html=render_body(body, _image_urls(recap_id)))
 
 
 @router.post("/{recap_id}")

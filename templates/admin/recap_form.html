@@ -30,6 +30,33 @@
   {% if preview_html is not none %}
     <section id="preview">{{ preview_html | safe }}</section>
   {% endif %}
+  {% if recap %}
+    <section id="images">
+      <h2>Images</h2>
+      {% if snippet %}<p>Paste into the Body: <code id="snippet">{{ snippet }}</code></p>{% endif %}
+      <ul>
+        {% for image in images %}
+          <li><img src="/admin/recaps/{{ recap.id }}/images/{{ image.filename }}" alt="{{ image.alt }}" width="120">
+            {{ image.alt }}
+            {% if can_edit_images %}
+              <form method="post" action="/admin/recaps/{{ recap.id }}/images/{{ image.id }}/delete">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+                <button type="submit">Delete image</button>
+              </form>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+      {% if can_edit_images %}
+        <form method="post" action="/admin/recaps/{{ recap.id }}/images" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+          <p><label>Image (JPEG, PNG or WebP, up to 5 MB) <input type="file" name="file" accept="image/jpeg,image/png,image/webp" required></label></p>
+          <p><label>Alt text <input type="text" name="alt" required></label></p>
+          <p><button type="submit">Upload image</button></p>
+        </form>
+      {% endif %}
+    </section>
+  {% endif %}
   {% for name, label in status_actions %}
     <form method="post" action="/admin/recaps/{{ recap.id }}/{{ name }}">
       <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
