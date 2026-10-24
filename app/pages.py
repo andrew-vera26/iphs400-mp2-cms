@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import sqlite3
 
-from app import db
+from app import db, site_state
 from app.slugs import is_url_safe
 
 # Slugs the Public site already uses for something else.
@@ -99,7 +99,9 @@ def update_page(page_id: int, title: str, slug: str, body: str,
 
 def delete_page(page_id: int) -> None:
     with db.connect() as conn:
-        conn.execute("DELETE FROM page WHERE id = ?", (page_id,))
+        if conn.execute("DELETE FROM page WHERE id = ?",
+                        (page_id,)).rowcount:
+            site_state.note_removal(conn)
 
 
 def transition(page_id: int, action: str) -> None:
@@ -107,7 +109,9 @@ def transition(page_id: int, action: str) -> None:
     simultaneous requests cannot both move it. Raises TransitionRefused."""
     from_status, to_status = TRANSITIONS[action]
     with db.connect() as conn:
-        cur = conn.execute("UPDATE page SET status = ? WHERE id = ? "
-                           "AND status = ?", (to_status, page_id, from_status))
+        cur = conn.execute("UPDATE page SET status = ?, edited_at = "
+                           "strftime('%Y-%m-%dT%H:%M:%SZ', 'now') "
+                           "WHERE id = ? AND status = ?",
+                           (to_status, page_id, from_status))
         if cur.rowcount == 0:
             raise TransitionRefused(action)

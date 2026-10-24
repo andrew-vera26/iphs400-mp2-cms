@@ -3,6 +3,23 @@
 {% block content %}
   <h1>Recaps</h1>
   <p><a href="/admin/recaps/new">New Recap</a></p>
+  <form method="get" action="/admin/recaps">
+    <label>Status
+      <select name="status"><option value="">Any</option>
+      {% for s in statuses %}<option value="{{ s }}"{% if selected.status == s %} selected{% endif %}>{{ s | capitalize }}</option>{% endfor %}
+      </select></label>
+    <label>Trip
+      <select name="trip"><option value="">Any</option>
+      {% for t in trips %}<option value="{{ t.id }}"{% if selected.trip == t.id %} selected{% endif %}>{{ t.conference }}</option>{% endfor %}
+      </select></label>
+    {% if account.role == "admin" %}
+    <label>Owner
+      <select name="owner"><option value="">Any</option>
+      {% for o in owners %}<option value="{{ o.id }}"{% if selected.owner == o.id %} selected{% endif %}>{{ o.name }}</option>{% endfor %}
+      </select></label>
+    {% endif %}
+    <button type="submit">Filter</button>
+  </form>
   <table>
     <thead><tr><th>Title</th><th>Trip</th><th>Byline</th><th>Owner</th><th>Status</th><th>Actions</th></tr></thead>
     <tbody>

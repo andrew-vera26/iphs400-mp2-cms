@@ -77,6 +77,7 @@ _Avoid_: Publish (for this action), build, push
 
 **Site state**:
 The single record of when `cms publish` last rendered the Public site. Changes made after that moment are not yet live, which is what the dashboard's "changes not yet live" notice reports.
+Counted as changes: creating, editing or deleting a Trip, Recap or Page; adding or deleting a Recap's Image; and Publish, Unpublish, Submit and Send back. A Recap's or Page's "last edited" time therefore also moves on Publish and Unpublish, and Draft changes can also turn the notice on. Both are deliberate: the notice errs toward telling an Admin to Deploy. Stamps have one-second precision, so a change in the same second as the render counts as already rendered.
 _Avoid_: Publish timestamp (Published is a Recap's or Page's status)
 
 **Backup**:

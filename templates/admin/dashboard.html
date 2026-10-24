@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block header %}{% include "admin/_header.html" %}{% endblock %}
+{% block content %}
+  <h1>Hello admin console</h1>
+  <p>You are signed in to the admin console.</p>
+  {% if not_live %}
+  <p role="status" id="changes-not-live">There are changes not yet live. Run <code>cms publish</code>, then <code>cms deploy</code>.</p>
+  {% endif %}
+  <h2>Recaps{% if account.role != "admin" %} (yours){% endif %}</h2>
+  <ul>
+    {% for status in ["draft", "submitted", "published"] %}
+    <li>{{ status | capitalize }}: <span data-count="recaps-{{ status }}">{{ recap_counts[status] }}</span></li>
+    {% endfor %}
+  </ul>
+  {% if account.role == "admin" %}
+  <h2>Site</h2>
+  <ul>
+    <li>Trips: <span data-count="trips">{{ admin.trips }}</span></li>
+    <li>Draft Pages: <span data-count="pages-draft">{{ admin.pages.draft }}</span></li>
+    <li>Published Pages: <span data-count="pages-published">{{ admin.pages.published }}</span></li>
+    <li>Active Accounts: <span data-count="accounts-active">{{ admin.accounts }}</span></li>
+  </ul>
+  {% endif %}
+{% endblock %}

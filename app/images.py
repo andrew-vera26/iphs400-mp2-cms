@@ -58,6 +58,13 @@ _RECAP_OPEN = ("EXISTS (SELECT 1 FROM recap WHERE id = :recap_id AND "
                "(:editor_id IS NULL OR (status = 'draft' AND owner_id = :editor_id)))")
 
 
+def _touch_recap(conn, recap_id: int) -> None:
+    """An Image is part of its Recap, so adding or removing one is an edit."""
+    conn.execute("UPDATE recap SET edited_at = "
+                 "strftime('%Y-%m-%dT%H:%M:%SZ', 'now') WHERE id = ?",
+                 (recap_id,))
+
+
 def add_image(recap_id: int, data: bytes | None, alt: str,
               editor_id: int | None = None) -> sqlite3.Row | None:
     """Validate and store an upload; return its row. Raises ImageRefused with a
@@ -90,6 +97,7 @@ def add_image(recap_id: int, data: bytes | None, alt: str,
             if cur.rowcount == 0:
                 path.unlink()
                 return None
+            _touch_recap(conn, recap_id)
             return conn.execute("SELECT * FROM image WHERE id = ?",
                                 (cur.lastrowid,)).fetchone()
     except BaseException:
@@ -121,5 +129,6 @@ def delete_image(image_id: int, recap_id: int,
         if row is None:
             return False
         conn.execute("DELETE FROM image WHERE id = ?", (image_id,))
+        _touch_recap(conn, recap_id)
     remove_files([row["filename"]])
     return True

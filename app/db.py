@@ -73,7 +73,8 @@ CREATE TABLE IF NOT EXISTS image (
 
 CREATE TABLE IF NOT EXISTS site_state (
     id                INTEGER PRIMARY KEY CHECK (id = 1),
-    last_rendered_at  TEXT
+    last_rendered_at  TEXT,
+    content_changed_at TEXT
 );
 """
 
@@ -111,3 +112,7 @@ def init_db() -> None:
     with connect() as conn:
         conn.executescript(SCHEMA)
         _add_column_if_missing(conn, "recap", "published_at", "TEXT")
+        # A development database created while this column had another name
+        # (last_published_at) may still have the old column; it is left alone.
+        _add_column_if_missing(conn, "site_state", "last_rendered_at", "TEXT")
+        _add_column_if_missing(conn, "site_state", "content_changed_at", "TEXT")

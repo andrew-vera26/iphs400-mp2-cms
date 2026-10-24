@@ -5,7 +5,7 @@ import re
 import sqlite3
 from datetime import date
 
-from app import db
+from app import db, site_state
 
 FIELDS = ("conference", "city", "start_date", "end_date", "summary", "slug")
 
@@ -72,10 +72,13 @@ def delete_trip(trip_id: int) -> bool:
     no such Trip, or it still has Recaps. One statement, so a Recap saved at the
     same moment cannot be orphaned."""
     with db.connect() as conn:
-        return conn.execute(
+        deleted = conn.execute(
             "DELETE FROM trip WHERE id = ? AND NOT EXISTS "
             "(SELECT 1 FROM recap WHERE recap.trip_id = trip.id)",
             (trip_id,)).rowcount == 1
+        if deleted:
+            site_state.note_removal(conn)
+        return deleted
 
 
 def list_trips() -> list[sqlite3.Row]:

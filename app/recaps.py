@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sqlite3
 
-from app import db, images
+from app import db, images, site_state
 
 
 class RecapLocked(ValueError):
@@ -54,8 +54,12 @@ def update_recap(recap_id: int, trip_id: int, title: str, slug: str, body: str,
         raise SlugTaken(slug) from exc
 
 
-def list_recaps(owner_id: int | None = None) -> list[sqlite3.Row]:
-    """Recaps with Trip and Owner names, newest first; only owner_id's if given."""
+def list_recaps(owner_id: int | None = None, status: str | None = None,
+                trip_id: int | None = None,
+                submitted_first: bool = False) -> list[sqlite3.Row]:
+    """Recaps with Trip and Owner names, newest first (Submitted ones ahead of
+    the rest if asked). Each filter given narrows the list; all values are
+    bound parameters."""
     with db.connect() as conn:
         return conn.execute(
             "SELECT recap.*, trip.conference AS trip_name, "
@@ -63,8 +67,12 @@ def list_recaps(owner_id: int | None = None) -> list[sqlite3.Row]:
             "JOIN trip ON trip.id = recap.trip_id "
             "JOIN account ON account.id = recap.owner_id "
             "WHERE (? IS NULL OR recap.owner_id = ?) "
-            "ORDER BY recap.created_at DESC, recap.id DESC",
-            (owner_id, owner_id)).fetchall()
+            "AND (? IS NULL OR recap.status = ?) "
+            "AND (? IS NULL OR recap.trip_id = ?) "
+            "ORDER BY (? AND recap.status = 'submitted') DESC, "
+            "recap.created_at DESC, recap.id DESC",
+            (owner_id, owner_id, status, status, trip_id, trip_id,
+             submitted_first)).fetchall()
 
 
 def delete_recap(recap_id: int, editor_id: int | None = None) -> None:
@@ -81,6 +89,8 @@ def delete_recap(recap_id: int, editor_id: int | None = None) -> None:
         if editor_id and cur.rowcount == 0:
             raise RecapLocked(recap_id)
         conn.execute("DELETE FROM image WHERE recap_id = ?", (recap_id,))
+        if cur.rowcount:
+            site_state.note_removal(conn)
     images.remove_files(filenames)
 
 
@@ -135,7 +145,8 @@ def transition(recap_id: int, action: str) -> None:
     stamp = PUBLISHED_AT_SQL.get(action, "")
     with db.connect() as conn:
         cur = conn.execute(
-            f"UPDATE recap SET status = ?{stamp} WHERE id = ? "
+            f"UPDATE recap SET status = ?{stamp}, "
+            "edited_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now') WHERE id = ? "
             f"AND status IN ({marks})",
             (to_status, recap_id, *from_statuses))
         if cur.rowcount == 0:

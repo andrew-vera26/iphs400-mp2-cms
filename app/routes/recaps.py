@@ -6,7 +6,7 @@ from typing import Callable
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, RedirectResponse
 
-from app import images, policy, recaps, settings, trips
+from app import accounts, dashboard, images, policy, recaps, settings, trips
 from app.flash import flash
 from app.markdown import images_without_alt, render_body
 from app.accounts import Account
@@ -141,15 +141,52 @@ def _save(request: Request, account: Account, form: dict[str, str],
     return RedirectResponse("/admin/recaps", status_code=303)
 
 
+MAX_ID_DIGITS = 18  # ids are SQLite integers; longer is never a real id
+
+
+def _one_param(request: Request, name: str) -> str | None:
+    """The single value of a query parameter, '' and absent meaning None.
+    A repeated parameter is refused rather than guessing which one counts."""
+    values = request.query_params.getlist(name)
+    if len(values) > 1:
+        raise HTTPException(400, "Invalid filter")
+    return values[0] or None if values else None
+
+
+def _filter_id(request: Request, name: str) -> int | None:
+    value = _one_param(request, name)
+    if value is None:
+        return None
+    if not (value.isascii() and value.isdigit()) or len(value) > MAX_ID_DIGITS:
+        raise HTTPException(400, "Invalid filter")
+    return int(value)
+
+
+def _filter_status(request: Request) -> str | None:
+    value = _one_param(request, "status")
+    if value is not None and value not in dashboard.RECAP_STATUSES:
+        raise HTTPException(400, "Invalid filter")
+    return value
+
+
 @router.get("")
 def list_recaps(request: Request,
                 account: Account = Depends(require("console.view"))):
-    # Editors see only their own Recaps; Admins see all of them.
-    owner_id = None if account.role == policy.ADMIN else account.id
+    status = _filter_status(request)
+    trip_id = _filter_id(request, "trip")
+    # Editors see only their own Recaps and any owner filter is ignored; the
+    # Owner filter is an Admin's.
+    is_admin = account.role == policy.ADMIN
+    owner_id = _filter_id(request, "owner") if is_admin else account.id
     return templates.TemplateResponse(
         request, "admin/recaps.html",
         {"title": "Recaps", "account": account,
-         "recaps": recaps.list_recaps(owner_id)})
+         "recaps": recaps.list_recaps(owner_id, status, trip_id,
+                                      submitted_first=is_admin),
+         "statuses": dashboard.RECAP_STATUSES, "trips": trips.list_trips(),
+         "owners": accounts.list_accounts() if is_admin else [],
+         "selected": {"status": status, "trip": trip_id,
+                      "owner": owner_id if is_admin else None}})
 
 
 @router.get("/new")
