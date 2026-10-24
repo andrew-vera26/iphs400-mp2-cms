@@ -8,7 +8,12 @@ ROOT = Path(__file__).resolve().parents[1]
 TEMPLATES = ROOT / "templates"
 SITE = ROOT / "site"
 
-SECRET_KEY = os.environ.get("CMS_SECRET_KEY", "dev-only-not-for-production")
+# DEVELOPMENT ONLY: this fallback key is public, so anyone can forge a session
+# cookie signed with it. It exists so `cms serve` starts with no .env. Set
+# CMS_SECRET_KEY for anything real; create_app() logs a warning while it is used.
+DEV_SECRET_KEY = "dev-only-not-for-production"
+SECRET_KEY = os.environ.get("CMS_SECRET_KEY", DEV_SECRET_KEY)
+SECRET_KEY_IS_DEV_DEFAULT = SECRET_KEY == DEV_SECRET_KEY
 DATABASE_PATH = Path(os.environ.get("CMS_DATABASE", ROOT / "cms.db"))
 SITE_TITLE = os.environ.get("CMS_SITE_TITLE", "My CMS")
 # Set this to your Pages URL once you deploy, e.g.
