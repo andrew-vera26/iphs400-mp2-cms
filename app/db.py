@@ -47,6 +47,11 @@ CREATE TABLE IF NOT EXISTS recap (
     published_at      TEXT,
     UNIQUE (trip_id, slug)
 );
+
+CREATE TABLE IF NOT EXISTS site_state (
+    id                INTEGER PRIMARY KEY CHECK (id = 1),
+    last_rendered_at  TEXT
+);
 """
 
 

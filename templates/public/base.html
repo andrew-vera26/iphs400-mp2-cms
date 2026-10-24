@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ title }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ css_path }}">
+</head>
+<body>
+  <header><a href="{{ home_path }}">{{ site_title }}</a></header>
+  <main>{% block content %}{% endblock %}</main>
+  <footer><small>Discuss the recaps on <a href="{{ instagram_url }}">Instagram</a>.</small></footer>
+</body>
+</html>

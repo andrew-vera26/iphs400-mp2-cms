@@ -1,0 +1,12 @@
+{% extends "public/base.html" %}
+{% from "public/_macros.html" import byline %}
+{% block title %}{{ trip.conference }} – {{ site_title }}{% endblock %}
+{% block content %}
+  <h1>{{ trip.conference }}</h1>
+  <p><small>{{ trip.city }}, {{ trip.start_date }} to {{ trip.end_date }}</small></p>
+  <section class="summary"><p>{{ trip.summary }}</p></section>
+  <h2>Recaps</h2>
+  <ul>
+    {% for recap in recaps %}<li><a href="{{ recap.slug }}/">{{ recap.title }}</a> <small>{{ byline(recap) }}</small></li>{% endfor %}
+  </ul>
+{% endblock %}

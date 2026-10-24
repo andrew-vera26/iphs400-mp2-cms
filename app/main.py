@@ -41,7 +41,9 @@ def create_app() -> FastAPI:
     def public_home(request: Request):
         return templates.TemplateResponse(
             request, "public/home.html",
-            {"title": settings.SITE_TITLE, "items": []},
+            {"title": settings.SITE_TITLE, "site_title": settings.SITE_TITLE,
+             "items": [], "css_path": "style.css", "home_path": "index.html",
+             "instagram_url": settings.INSTAGRAM_URL},
         )
 
     return app

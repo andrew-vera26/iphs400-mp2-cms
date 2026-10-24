@@ -1,0 +1,9 @@
+{% extends "public/base.html" %}
+{% from "public/_macros.html" import byline %}
+{% block title %}{{ recap.title }} – {{ site_title }}{% endblock %}
+{% block content %}
+  <p><a href="../">&larr; {{ trip.conference }}</a></p>
+  <h1>{{ recap.title }}</h1>
+  <p><small>{{ byline(recap) }}</small></p>
+  <article>{{ body_html | safe }}</article>
+{% endblock %}

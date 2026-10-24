@@ -1,0 +1,3 @@
+{% macro byline(recap) -%}
+by {{ recap.byline_name }} '{{ '%02d' % (recap.byline_class_year % 100) }}
+{%- endmacro %}

@@ -10,7 +10,7 @@ import argparse
 import subprocess
 import sys
 
-from app import settings
+from app import settings, site_state
 from app.publish import render_site
 
 
@@ -33,6 +33,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "publish":
         out = render_site()
+        site_state.record_render()
         print(f"Wrote {out}. Preview it with:  python3 -m http.server -d {out} 8001")
         return 0
 

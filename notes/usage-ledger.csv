@@ -107,3 +107,9 @@ ts,session,phase,provider,model,effort,ctx_pct,five_h_pct,weekly_pct
 2026-10-24T16:19:04Z,9befb7af,T04,anthropic,Sonnet 5.5,medium,15.0,57,14
 2026-10-24T16:20:23Z,9befb7af,T04,anthropic,Sonnet 5.5,medium,15.0,57,14
 2026-10-24T16:23:35Z,9befb7af,T04,anthropic,Sonnet 5.5,medium,16.0,59,15
+2026-10-24T16:27:32Z,864dff2c,T04,anthropic,Sonnet 5.5,medium,5.0,59,15
+2026-10-24T16:33:06Z,13a6094f,T05,anthropic,Sonnet 5.5,medium,9.0,62,15
+2026-10-24T16:33:32Z,13a6094f,T05,anthropic,Sonnet 5.5,medium,9.0,63,15
+2026-10-24T16:34:44Z,13a6094f,T05,anthropic,Sonnet 5.5,medium,10.0,64,15
+2026-10-24T16:37:09Z,13a6094f,T05,anthropic,Sonnet 5.5,medium,10.0,64,15
+2026-10-24T16:39:01Z,13a6094f,T05,anthropic,Sonnet 5.5,medium,10.0,65,15

@@ -19,3 +19,6 @@ SITE_TITLE = os.environ.get("CMS_SITE_TITLE", "My CMS")
 # Set this to your Pages URL once you deploy, e.g.
 # https://yourname.github.io/iphs400-mp2-cms/
 BASE_PATH = os.environ.get("CMS_BASE_PATH", "")
+# The club's Instagram, linked from every page's footer for discussion. A
+# committed constant, not an environment variable: replace the placeholder.
+INSTAGRAM_URL = "https://www.instagram.com/REPLACE-ME/"

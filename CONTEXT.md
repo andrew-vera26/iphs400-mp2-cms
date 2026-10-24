@@ -75,6 +75,10 @@ _Avoid_: using "publish" for rebuilding the site
 Rebuilding the Public site from the Trips, Published Recaps, and Published Pages, and pushing it live. Only Admins deploy. A Deploy is two commands: `cms publish` renders the Public site into `site/`, and `cms deploy` pushes it live. Despite its name, `cms publish` does not Publish anything.
 _Avoid_: Publish (for this action), build, push
 
+**Site state**:
+The single record of when `cms publish` last rendered the Public site. Changes made after that moment are not yet live, which is what the dashboard's "changes not yet live" notice reports.
+_Avoid_: Publish timestamp (Published is a Recap's or Page's status)
+
 **Backup**:
 A dated archive of the database and uploaded Images, kept somewhere private outside the repository. It is the only copy of Drafts and Recap sources if the Console laptop is lost. Only Admins make Backups.
 
