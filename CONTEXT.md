@@ -72,7 +72,7 @@ Moving a Recap or Page to Published, or from Published back to Draft. Only Admin
 _Avoid_: using "publish" for rebuilding the site
 
 **Deploy**:
-Rebuilding the Public site from the Trips, Published Recaps, and Published Pages, and pushing it live. Only Admins deploy. The assignment names the command `cms publish`. That command performs a Deploy, despite its name.
+Rebuilding the Public site from the Trips, Published Recaps, and Published Pages, and pushing it live. Only Admins deploy. A Deploy is two commands: `cms publish` renders the Public site into `site/`, and `cms deploy` pushes it live. Despite its name, `cms publish` does not Publish anything.
 _Avoid_: Publish (for this action), build, push
 
 **Backup**:
