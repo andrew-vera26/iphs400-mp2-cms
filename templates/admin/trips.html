@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block header %}{% include "admin/_header.html" %}{% endblock %}
+{% block content %}
+  <h1>Trips</h1>
+  {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+  <p><a href="/admin/trips/new">New Trip</a></p>
+  <table>
+    <thead><tr><th>Conference</th><th>City</th><th>Dates</th><th>Slug</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for t in trips %}
+      <tr>
+        <td><a href="/admin/trips/{{ t.id }}">{{ t.conference }}</a></td><td>{{ t.city }}</td>
+        <td>{{ t.start_date }} to {{ t.end_date }}</td><td>{{ t.slug }}</td>
+        <td>
+          <form method="post" action="/admin/trips/{{ t.id }}/delete">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+            <button type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

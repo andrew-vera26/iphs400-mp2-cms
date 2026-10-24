@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block header %}{% include "admin/_header.html" %}{% endblock %}
+{% block content %}
+  <h1>Recaps</h1>
+  <p><a href="/admin/recaps/new">New Recap</a></p>
+  <table>
+    <thead><tr><th>Title</th><th>Trip</th><th>Byline</th><th>Owner</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for r in recaps %}
+      <tr>
+        <td><a href="/admin/recaps/{{ r.id }}">{{ r.title }}</a></td>
+        <td>{{ r.trip_name }}</td>
+        <td>{{ r.byline_name }} '{{ r.byline_class_year % 100 }}</td>
+        <td>{{ r.owner_name }}</td><td>{{ r.status | capitalize }}</td>
+        <td>
+          <form method="post" action="/admin/recaps/{{ r.id }}/delete">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+            <button type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block header %}{% include "admin/_header.html" %}{% endblock %}
+{% block content %}
+  <h1>{{ title }}</h1>
+  {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+  {% if recap %}
+    <dl>
+      <dt>Status</dt><dd>{{ recap.status | capitalize }}</dd>
+      <dt>Owner</dt><dd>{{ recap.owner_name }}</dd>
+      <dt>Created</dt><dd>{{ recap.created_at }}</dd>
+      <dt>Last edited</dt><dd>{{ recap.edited_at }}</dd>
+    </dl>
+  {% endif %}
+  <form method="post" action="{{ action }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+    <p><label>Trip
+      <select name="trip_id" required>
+        {% for t in trips %}<option value="{{ t.id }}" {% if t.id|string == values.trip_id|string %}selected{% endif %}>{{ t.conference }} ({{ t.slug }})</option>{% endfor %}
+      </select></label></p>
+    <p><label>Title <input type="text" name="title" value="{{ values.title }}" required></label></p>
+    <p><label>Slug <input type="text" name="slug" value="{{ values.slug }}" required></label></p>
+    <p><label>Body (Markdown) <textarea name="body" required>{{ values.body }}</textarea></label></p>
+    {% if account.role == "admin" %}
+      <p><label>Byline name <input type="text" name="byline_name" value="{{ values.byline_name }}" required></label></p>
+      <p><label>Byline class year <input type="number" name="byline_class_year" value="{{ values.byline_class_year }}" required></label></p>
+    {% endif %}
+    <p><button type="submit">Save Recap</button> <a href="/admin/recaps">Cancel</a></p>
+  </form>
+{% endblock %}

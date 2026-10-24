@@ -18,6 +18,34 @@ CREATE TABLE IF NOT EXISTS account (
     active        INTEGER NOT NULL DEFAULT 1,
     created_at    TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
 );
+
+CREATE TABLE IF NOT EXISTS trip (
+    id         INTEGER PRIMARY KEY,
+    conference TEXT NOT NULL,
+    city       TEXT NOT NULL,
+    start_date TEXT NOT NULL,
+    end_date   TEXT NOT NULL,
+    summary    TEXT NOT NULL,
+    slug       TEXT NOT NULL UNIQUE,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    edited_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+);
+
+CREATE TABLE IF NOT EXISTS recap (
+    id                INTEGER PRIMARY KEY,
+    trip_id           INTEGER NOT NULL REFERENCES trip (id),
+    owner_id          INTEGER NOT NULL REFERENCES account (id),
+    title             TEXT NOT NULL,
+    slug              TEXT NOT NULL,
+    body              TEXT NOT NULL,
+    byline_name       TEXT NOT NULL,
+    byline_class_year INTEGER NOT NULL,
+    status            TEXT NOT NULL DEFAULT 'draft'
+                      CHECK (status IN ('draft', 'submitted', 'published')),
+    created_at        TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    edited_at         TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    UNIQUE (trip_id, slug)
+);
 """
 
 

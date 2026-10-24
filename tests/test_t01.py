@@ -18,6 +18,12 @@ ADMIN_ONLY_ROUTES: list[tuple[str, str]] = [
     ("POST", "/admin/accounts/1/role"),
     ("POST", "/admin/accounts/1/deactivate"),
     ("POST", "/admin/accounts/1/password"),
+    # T03: Trips
+    ("GET", "/admin/trips/new"),
+    ("GET", "/admin/trips/1"),
+    ("POST", "/admin/trips"),
+    ("POST", "/admin/trips/1"),
+    ("POST", "/admin/trips/1/delete"),
 ]
 
 

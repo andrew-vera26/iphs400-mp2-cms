@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block header %}{% include "admin/_header.html" %}{% endblock %}
+{% block content %}
+  <h1>{{ title }}</h1>
+  {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+  <form method="post" action="{{ action }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+    <p><label>Conference <input type="text" name="conference" value="{{ values.conference }}" required></label></p>
+    <p><label>Host city <input type="text" name="city" value="{{ values.city }}" required></label></p>
+    <p><label>Start date <input type="date" name="start_date" value="{{ values.start_date }}" required></label></p>
+    <p><label>End date <input type="date" name="end_date" value="{{ values.end_date }}" required></label></p>
+    <p><label>Summary <textarea name="summary" required>{{ values.summary }}</textarea></label></p>
+    <p><label>Slug <input type="text" name="slug" value="{{ values.slug }}" required></label></p>
+    <p><button type="submit">Save Trip</button> <a href="/admin/trips">Cancel</a></p>
+  </form>
+{% endblock %}

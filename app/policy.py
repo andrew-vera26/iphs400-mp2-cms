@@ -16,10 +16,24 @@ EDITOR = "editor"
 ROLE_RULES: dict[str, frozenset[str]] = {
     "console.view": frozenset({ADMIN, EDITOR}),
     "accounts.manage": frozenset({ADMIN}),
+    "trips.manage": frozenset({ADMIN}),
+    "recaps.create": frozenset({ADMIN, EDITOR}),
+    "recaps.view": frozenset({ADMIN, EDITOR}),
+    "recaps.edit": frozenset({ADMIN, EDITOR}),
+    "recaps.delete": frozenset({ADMIN, EDITOR}),
 }
+
+# Actions on one Recap. An Editor may do these only to a Draft they Own; an
+# Admin may do them to any Recap. `obj` is the Recap row.
+RECAP_ACTIONS = frozenset({"recaps.view", "recaps.edit", "recaps.delete"})
 
 
 def can(account: Account | None, action: str, obj: object | None = None) -> bool:
     if account is None or not account.active:
         return False
-    return account.role in ROLE_RULES.get(action, frozenset())
+    if account.role not in ROLE_RULES.get(action, frozenset()):
+        return False
+    if action in RECAP_ACTIONS and account.role != ADMIN:
+        return (obj is not None and obj["owner_id"] == account.id
+                and obj["status"] == "draft")
+    return True
