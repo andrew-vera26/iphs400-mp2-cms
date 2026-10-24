@@ -19,6 +19,7 @@ ADMIN_ONLY_ROUTES: list[tuple[str, str]] = [
     ("POST", "/admin/accounts/1/deactivate"),
     ("POST", "/admin/accounts/1/password"),
     # T03: Trips
+    ("GET", "/admin/trips"),
     ("GET", "/admin/trips/new"),
     ("GET", "/admin/trips/1"),
     ("POST", "/admin/trips"),
@@ -39,23 +40,37 @@ ADMIN_ONLY_ROUTES: list[tuple[str, str]] = [
     ("POST", "/admin/pages/1/unpublish"),
     ("POST", "/admin/pages/preview"),
     ("POST", "/admin/pages/1/preview"),
+    # T09: a Recap the Editor doesn't Own ({other} is a real Admin-owned Draft)
+    ("POST", "/admin/recaps/{other}"),
+    ("POST", "/admin/recaps/{other}/submit"),
+    ("POST", "/admin/recaps/{other}/delete"),
 ]
 
 
 @pytest.mark.parametrize("method,path", ADMIN_ONLY_ROUTES)
 def test_editor_on_admin_only_routes(client_as, method, path):
+    from tests.test_t03 import make_recap, make_trip, recap_form, recap_row
+    admin = client_as("admin")
+    trip_id = make_trip(admin)
+    other = make_recap(admin, trip_id)
+    before = dict(recap_row(other))
+
     c = client_as("editor")
     token = csrf_from(c.get("/admin"))
-    r = c.request(method, path, data={"csrf_token": token},
-                  follow_redirects=False)
-    assert r.status_code in (302, 303, 403)
+    form = recap_form(trip_id, title="Editor rewrite", slug="editor-rewrite")
+    r = c.request(method, path.format(other=other),
+                  data={"csrf_token": token, **form}, follow_redirects=False)
+
+    # logged in but not allowed is a 403, never a redirect to a success page
+    assert r.status_code == 403
+    assert dict(recap_row(other)) == before
 
 
 # ---- login / logout -------------------------------------------------------
 
 @pytest.mark.parametrize("role", ["admin", "editor"])
 def test_seeded_accounts_can_log_in(client_as, role):
-    assert "hello admin" in client_as(role).get("/admin").text.lower()
+    assert "<h1>Dashboard</h1>" in client_as(role).get("/admin").text
 
 
 def test_wrong_password_and_unknown_email_look_identical(client):

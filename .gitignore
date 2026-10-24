@@ -7,3 +7,4 @@ __pycache__/
 .claude/state/
 .DS_Store
 uploads/
+cms-backup-*.zip

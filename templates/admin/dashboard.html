@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block header %}{% include "admin/_header.html" %}{% endblock %}
 {% block content %}
-  <h1>Hello admin console</h1>
+  <h1>Dashboard</h1>
   <p>You are signed in to the admin console.</p>
   {% if not_live %}
   <p role="status" id="changes-not-live">There are changes not yet live. Run <code>cms publish</code>, then <code>cms deploy</code>.</p>
