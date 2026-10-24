@@ -1,13 +1,18 @@
-# IPHS 400 — Mini-Project #2 starter (Web CMS)
+# Kenyon Model UN Recaps CMS
 
-Click **Use this template** → name your repo **`iphs400-mp2-cms`** → make it **Public**.
-Do not fork: a fork arrives without an Issues tab, and your tickets live in Issues.
+A content management system where club members write trip recaps and officers publish them to a static GitHub Pages site. It is IPHS 400 Mini-Project #2.
 
-## Start here
+## Features
 
-1. `docs/manual_iphs400_mp2-web-cms_20260922.md` — the manual. Read Part 0 and Part 1 first.
-2. `docs/mp2-grading-rubric_20260922.md` — how you are graded. Read it **before** you build or revise.
-3. `docs/mp2-setup_context-threshold-hook_20260922.md` — Exercise A, in Part 4 of the manual.
+- Login with argon2 password hashes and CSRF protection on every form
+- Two roles, Admin and Editor, with Editors limited to their own Recaps
+- Trips and Recaps, with Draft, Submitted and Published states
+- Pages that appear in the public navigation
+- A dashboard with counts and a filterable content list
+- A Markdown editor with a sanitized Preview
+- Image uploads with required alt text
+- Account management, including Deactivate
+- `cms publish`, `cms deploy` and `cms backup` commands
 
 ## Live URL
 
@@ -74,21 +79,19 @@ the settings in `.env` are loaded.
 ## What is here
 
 ```text
-.claude/hooks/     the context meter and usage ledger (Exercise A lives in ctx_guard.py)
-scripts/           usage_report.py (Exercise B lives in spend()), check_submission.py, seed_demo.py
-tests/             the exercise tests, plus helpers such as client_as("editor")
-app/, templates/   the T00 skeleton — every CMS feature is yours to build
-docs/adr/          two example decision records
+app/               the FastAPI admin console and the publisher
+  routes/          login, console, trips, recaps, pages and accounts routes
+  static/          admin.css, the admin stylesheet
+templates/         Jinja templates: admin/ (console) and public/ (published site)
+tests/             one test file per ticket (T00-T09), plus the admin style and 403 page tests
+scripts/           seed_demo.py, usage_report.py, check_submission.py
+docs/              screenshots, handoffs, process notes and the project report
+docs/adr/          three decision records (ADR-001 to ADR-003)
+.claude/hooks/     the context meter and usage ledger
+CONTEXT.md         the project glossary
 ```
 
 The CMS is complete (tickets T00-T09), both exercise functions, `decide()` and `spend()`, are implemented, the test suite passes, and the demo site is published to GitHub Pages from the `gh-pages` branch.
-
-## Deadlines
-
-Stage 1 (`mp2-mvp` tag): Tue Sep 29, 2:40 pm Eastern. A preliminary checkpoint, past and ungraded; its 15 points are credited for the tag.
-Stage 2 (`mp2-final` tag): the final, graded submission, due Thu Oct 15, 2:40 pm Eastern, grace until Fri Oct 16, 2:40 pm. The first round (due Oct 6) was graded and returned on Oct 8; the deadline was extended so you can revise after feedback, and one revised `mp2-final` by Oct 15 replaces the earlier grade.
-MP2plus (optional extra credit): assigned Sun Oct 11, due Tue Oct 20, 2:40 pm Eastern, grace until Wed Oct 21, 2:40 pm. Each exercise is worth 5–10 points, added to your MP2 grade, up to +30.
-MP2 is graded as a score out of 100, scaled to 5% of the course grade.
 
 Run `uv run python scripts/check_submission.py --stage 2` before you submit.
 
