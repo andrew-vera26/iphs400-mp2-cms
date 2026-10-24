@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block header %}{% include "admin/_header.html" %}{% endblock %}
+{% block content %}
+  <h1>Accounts</h1>
+  {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+  <p><a href="/admin/accounts/new">New Account</a></p>
+  <table>
+    <thead><tr><th>Name</th><th>Email</th><th>Class</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for a in accounts %}
+      <tr>
+        <td>{{ a.name }}</td><td>{{ a.email }}</td><td>{{ a.class_year }}</td>
+        <td>{{ a.role | capitalize }}</td><td>{{ "Active" if a.active else "Deactivated" }}</td>
+        <td>
+        {% if a.active %}
+          <form method="post" action="/admin/accounts/{{ a.id }}/role">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+            <select name="role" aria-label="Role for {{ a.name }}">
+              {% for r in roles %}<option value="{{ r }}" {% if r == a.role %}selected{% endif %}>{{ r | capitalize }}</option>{% endfor %}
+            </select>
+            <button type="submit">Change role</button>
+          </form>
+          <form method="post" action="/admin/accounts/{{ a.id }}/password">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+            <input type="password" name="password" required aria-label="New password for {{ a.name }}">
+            <button type="submit">Set password</button>
+          </form>
+          <form method="post" action="/admin/accounts/{{ a.id }}/deactivate">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+            <button type="submit">Deactivate</button>
+          </form>
+        {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

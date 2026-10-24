@@ -12,7 +12,7 @@ from fastapi import Depends, FastAPI, Request
 from starlette.middleware.sessions import SessionMiddleware
 
 from app import db, settings
-from app.routes import auth, console
+from app.routes import accounts, auth, console
 from app.security import csrf_protect
 from app.templating import templates
 
@@ -33,6 +33,7 @@ def create_app() -> FastAPI:
 
     app.include_router(auth.router)
     app.include_router(console.router)
+    app.include_router(accounts.router)
 
     @app.get("/")
     def public_home(request: Request):

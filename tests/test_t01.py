@@ -10,7 +10,15 @@ GENERIC = "email or password is incorrect"
 
 # Every Admin-only route and action, as (method, path). Each later ticket adds
 # its own rows; an Editor must get a 403 (or a redirect) on all of them.
-ADMIN_ONLY_ROUTES: list[tuple[str, str]] = []
+ADMIN_ONLY_ROUTES: list[tuple[str, str]] = [
+    # T02: Account management
+    ("GET", "/admin/accounts"),
+    ("GET", "/admin/accounts/new"),
+    ("POST", "/admin/accounts"),
+    ("POST", "/admin/accounts/1/role"),
+    ("POST", "/admin/accounts/1/deactivate"),
+    ("POST", "/admin/accounts/1/password"),
+]
 
 
 @pytest.mark.parametrize("method,path", ADMIN_ONLY_ROUTES)

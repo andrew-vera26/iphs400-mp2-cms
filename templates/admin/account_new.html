@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block header %}{% include "admin/_header.html" %}{% endblock %}
+{% block content %}
+  <h1>New Account</h1>
+  {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+  <form method="post" action="/admin/accounts">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+    <p><label>Email <input type="email" name="email" value="{{ values.email }}" required></label></p>
+    <p><label>Name <input type="text" name="name" value="{{ values.name }}" required></label></p>
+    <p><label>Class year <input type="number" name="class_year" value="{{ values.class_year }}" required></label></p>
+    <p><label>Role
+      <select name="role">
+        {% for r in roles %}<option value="{{ r }}" {% if r == values.role %}selected{% endif %}>{{ r | capitalize }}</option>{% endfor %}
+      </select></label></p>
+    <p><label>Initial password <input type="password" name="password" required></label></p>
+    <p><button type="submit">Create Account</button> <a href="/admin/accounts">Cancel</a></p>
+  </form>
+{% endblock %}

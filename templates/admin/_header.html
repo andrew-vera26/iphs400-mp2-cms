@@ -1,0 +1,5 @@
+<form method="post" action="/logout">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+  {{ account.name }} ({{ account.role | capitalize }}) <button type="submit">Sign out</button>
+</form>
+<nav><a href="/admin">Admin</a> · <a href="/admin/accounts">Accounts</a></nav>
