@@ -20,8 +20,8 @@ SITE_TITLE = os.environ.get("CMS_SITE_TITLE", "My CMS")
 # https://yourname.github.io/iphs400-mp2-cms/
 BASE_PATH = os.environ.get("CMS_BASE_PATH", "")
 # The club's Instagram, linked from every page's footer for discussion. A
-# committed constant, not an environment variable: replace the placeholder.
-INSTAGRAM_URL = "https://www.instagram.com/REPLACE-ME/"
+# committed constant, not an environment variable: the club's Instagram link.
+INSTAGRAM_URL = "https://www.instagram.com/kenyonmun/"
 # Uploaded Recap Images. Gitignored, and outside SITE: only the Images of
 # Published Recaps are copied from here into the output.
 UPLOADS = Path(os.environ.get("CMS_UPLOADS", ROOT / "uploads"))

@@ -17,7 +17,7 @@ from app import cli, db, recaps, seed, settings, trips
 from app.markdown import render_body
 from app.publish import render_site
 
-HOME_PLACEHOLDER = "https://www.instagram.com/REPLACE-ME/"
+HOME_PLACEHOLDER = "https://www.instagram.com/kenyonmun/"
 HOSTILE = ("Hello **world**.\n\n<script>alert(1)</script>\n\n"
            "[evil](https://evil.example/x) ![pic](https://evil.example/p.png)\n\n"
            "Mail [me](mailto:jane@kenyon.edu) or jane@kenyon.edu")
