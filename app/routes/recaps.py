@@ -86,7 +86,7 @@ def _typed_byline(name: str, class_year: str):
 def _editor_id(account: Account) -> int | None:
     """The id to pin a write to an Editor's own Draft; None leaves an Admin's
     writes unrestricted."""
-    return None if account.role == policy.ADMIN else account.id
+    return None if policy.can(account, "recaps.edit_any") else account.id
 
 
 def _allowed_recap(recap_id: int, account: Account, action: str):
@@ -109,7 +109,7 @@ def _save(request: Request, account: Account, form: dict[str, str],
     An Editor's Byline is never read from the form: it is their Account's on
     creation and unchanged on edit. An Admin types it.
     """
-    if account.role == policy.ADMIN:
+    if policy.can(account, "recaps.type_byline"):
         byline = _typed_byline(form["byline_name"], form["byline_class_year"])
     elif existing is not None:
         byline = existing["byline_name"], existing["byline_class_year"]
@@ -176,17 +176,17 @@ def list_recaps(request: Request,
     trip_id = _filter_id(request, "trip")
     # Editors see only their own Recaps and any owner filter is ignored; the
     # Owner filter is an Admin's.
-    is_admin = account.role == policy.ADMIN
-    owner_id = _filter_id(request, "owner") if is_admin else account.id
+    see_all = policy.can(account, "recaps.see_all")
+    owner_id = _filter_id(request, "owner") if see_all else account.id
     return templates.TemplateResponse(
         request, "admin/recaps.html",
         {"title": "Recaps", "account": account,
          "recaps": recaps.list_recaps(owner_id, status, trip_id,
-                                      submitted_first=is_admin),
+                                      submitted_first=see_all),
          "statuses": dashboard.RECAP_STATUSES, "trips": trips.list_trips(),
-         "owners": accounts.list_accounts() if is_admin else [],
+         "owners": accounts.list_accounts() if see_all else [],
          "selected": {"status": status, "trip": trip_id,
-                      "owner": owner_id if is_admin else None}})
+                      "owner": owner_id if see_all else None}})
 
 
 @router.get("/new")

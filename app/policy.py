@@ -15,6 +15,8 @@ EDITOR = "editor"
 # action -> roles allowed to do it
 ROLE_RULES: dict[str, frozenset[str]] = {
     "console.view": frozenset({ADMIN, EDITOR}),
+    # the dashboard's site-wide counts and "changes not yet live" notice
+    "console.overview": frozenset({ADMIN}),
     "accounts.manage": frozenset({ADMIN}),
     "trips.manage": frozenset({ADMIN}),
     "pages.manage": frozenset({ADMIN}),
@@ -26,6 +28,12 @@ ROLE_RULES: dict[str, frozenset[str]] = {
     "recaps.publish": frozenset({ADMIN}),
     "recaps.unpublish": frozenset({ADMIN}),
     "recaps.send_back": frozenset({ADMIN}),
+    # everyone's Recaps in lists and counts, and the Owner filter
+    "recaps.see_all": frozenset({ADMIN}),
+    # writes to any Recap; otherwise a write is pinned to the Account's own
+    "recaps.edit_any": frozenset({ADMIN}),
+    # type a Contributor Byline; otherwise it comes from the Account
+    "recaps.type_byline": frozenset({ADMIN}),
 }
 
 # Actions on one Recap. An Editor may do these only to a Draft they Own; an

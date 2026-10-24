@@ -13,10 +13,11 @@ router = APIRouter(prefix="/admin")
 
 @router.get("")
 def admin_home(request: Request, account: Account = Depends(require("console.view"))):
-    is_admin = account.role == policy.ADMIN
+    see_all = policy.can(account, "recaps.see_all")
+    overview = policy.can(account, "console.overview")
     context = {
         "title": "Admin", "account": account,
-        "recap_counts": dashboard.recap_counts(None if is_admin else account.id),
-        "admin": dashboard.admin_counts() if is_admin else None,
-        "not_live": is_admin and site_state.changes_not_live()}
+        "recap_counts": dashboard.recap_counts(None if see_all else account.id),
+        "admin": dashboard.admin_counts() if overview else None,
+        "not_live": overview and site_state.changes_not_live()}
     return templates.TemplateResponse(request, "admin/dashboard.html", context)
