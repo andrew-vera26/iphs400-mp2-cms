@@ -1,0 +1,111 @@
+/* Admin console styles. Plain CSS, system fonts only. */
+:root {
+  --ink: #1d2433;
+  --muted: #5b6475;
+  --paper: #ffffff;
+  --page: #f4f5f8;
+  --line: #d5d9e2;
+  --accent: #3b2a7a;
+  --accent-ink: #ffffff;
+  --danger: #a3262a;
+  --focus: #1a6dff;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+header, main, footer {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
+}
+
+header { background: var(--paper); border-bottom: 1px solid var(--line); max-width: none; }
+header > * { max-width: 64rem; margin-left: auto; margin-right: auto; }
+header form { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; justify-content: flex-end; }
+nav { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; padding: 0.5rem 0; }
+nav a { font-weight: 600; }
+
+main { background: var(--paper); border: 1px solid var(--line); border-radius: 6px; margin-top: 1rem; padding: 1rem 1.25rem; }
+footer { color: var(--muted); }
+
+h1 { font-size: 1.6rem; line-height: 1.2; margin: 0.5rem 0 1rem; }
+h2 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+
+a { color: var(--accent); }
+a:hover { text-decoration-thickness: 2px; }
+
+p[role="status"] {
+  background: #e8f3ea;
+  border-left: 4px solid #2e7d46;
+  margin: 0.5rem auto;
+  max-width: 64rem;
+  padding: 0.5rem 0.75rem;
+}
+
+label { display: inline-block; margin: 0.25rem 0.75rem 0.25rem 0; font-weight: 600; }
+input, select, textarea, button { font: inherit; }
+input[type="text"], input[type="email"], input[type="password"],
+input[type="number"], input[type="date"], input:not([type]), select, textarea {
+  max-width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+}
+label:has(textarea) { display: block; }
+textarea { display: block; width: 100%; min-height: 12rem; font-family: ui-monospace, Menlo, Consolas, monospace; }
+
+button, input[type="submit"] {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  cursor: pointer;
+}
+button:hover { filter: brightness(1.15); }
+form[action$="/delete"] button, form[action$="/deactivate"] button {
+  background: var(--paper);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; }
+dt { font-weight: 600; }
+dd { margin: 0; }
+
+.table-scroll { overflow-x: auto; max-width: 100%; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border-bottom: 1px solid var(--line); padding: 0.5rem 0.6rem; text-align: left; vertical-align: top; }
+th { background: var(--page); white-space: nowrap; }
+td form { margin: 0.25rem 0; display: flex; flex-wrap: nowrap; gap: 0.25rem; }
+td:last-child { white-space: nowrap; }
+
+#preview { border: 1px dashed var(--line); border-radius: 4px; margin: 1rem 0; padding: 0.5rem 1rem; }
+img { max-width: 100%; height: auto; }
+
+@media (max-width: 40rem) {
+  body { font-size: 15px; }
+  header, main, footer { padding-left: 0.75rem; padding-right: 0.75rem; }
+  main { border-left: 0; border-right: 0; border-radius: 0; margin-top: 0.5rem; padding: 0.75rem; }
+  h1 { font-size: 1.4rem; }
+  dl { grid-template-columns: 1fr; }
+  input[type="text"], input[type="email"], input[type="password"], select { width: 100%; }
+  label { display: block; margin-right: 0; }
+  table input, table select { width: auto; }
+  header form { justify-content: flex-start; }
+}

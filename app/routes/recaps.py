@@ -11,7 +11,7 @@ from app.flash import flash
 from app.markdown import images_without_alt, render_body
 from app.accounts import Account
 from app.routes.accounts import CLASS_YEAR, CLASS_YEAR_RANGE
-from app.security import require
+from app.security import PermissionDenied, require
 from app.slugs import is_url_safe, slugify
 from app.templating import templates
 
@@ -95,7 +95,7 @@ def _allowed_recap(recap_id: int, account: Account, action: str):
     if recap is None:
         raise HTTPException(404, "No such Recap")
     if not policy.can(account, action, recap):
-        raise HTTPException(403, "You do not have permission to do that")
+        raise PermissionDenied()
     return recap
 
 

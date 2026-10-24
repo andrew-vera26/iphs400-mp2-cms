@@ -8,12 +8,16 @@ from __future__ import annotations
 
 import logging
 
+from pathlib import Path
+
 from fastapi import Depends, FastAPI, Request
+from fastapi.exception_handlers import http_exception_handler
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 from app import db, settings
 from app.routes import accounts, auth, console, pages, recaps, trips
-from app.security import csrf_protect
+from app.security import PermissionDenied, csrf_protect, current_account
 from app.templating import templates
 
 
@@ -30,6 +34,21 @@ def create_app() -> FastAPI:
     app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY,
                        session_cookie="cms_session", same_site="lax",
                        https_only=False)
+
+    # Only app/static/ is served; never the repo root, uploads or site/.
+    app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"),
+              name="static")
+
+    @app.exception_handler(PermissionDenied)
+    async def permission_denied(request: Request, exc: PermissionDenied):
+        """A browser gets a styled page with a way back; anything else keeps
+        the JSON body."""
+        account = current_account(request)
+        if "text/html" not in request.headers.get("accept", "") or account is None:
+            return await http_exception_handler(request, exc)
+        return templates.TemplateResponse(
+            request, "admin/denied.html", {"title": "Not allowed", "account": account},
+            status_code=403)
 
     app.include_router(auth.router)
     app.include_router(console.router)

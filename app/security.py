@@ -18,6 +18,17 @@ SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
 LOGIN_URL = "/login"
 
 
+PERMISSION_DETAIL = "You do not have permission to do that"
+
+
+class PermissionDenied(HTTPException):
+    """The Account is signed in but the policy says no. Distinct from the CSRF
+    refusal, which is also a 403: a browser is shown a page for this one."""
+
+    def __init__(self) -> None:
+        super().__init__(403, PERMISSION_DETAIL)
+
+
 def csrf_token(request: Request) -> str:
     """The session's CSRF token, created on first use."""
     token = request.session.get("csrf")
@@ -55,7 +66,7 @@ def require(action: str) -> Callable[..., Account]:
         if account is None:
             raise HTTPException(303, headers={"Location": LOGIN_URL})
         if not policy.can(account, action):
-            raise HTTPException(403, "You do not have permission to do that")
+            raise PermissionDenied()
         return account
 
     return guard

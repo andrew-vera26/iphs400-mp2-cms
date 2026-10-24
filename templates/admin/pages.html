@@ -4,6 +4,7 @@
   <h1>Pages</h1>
   <p><a href="/admin/pages/new">New Page</a></p>
   <p>Show: <a href="/admin/pages">All</a> · <a href="/admin/pages?status=draft">Draft</a> · <a href="/admin/pages?status=published">Published</a></p>
+  <div class="table-scroll">
   <table>
     <thead><tr><th>Title</th><th>Slug</th><th>Nav position</th><th>Owner</th><th>Status</th><th>Actions</th></tr></thead>
     <tbody>
@@ -22,4 +23,5 @@
     {% endfor %}
     </tbody>
   </table>
+  </div>
 {% endblock %}
