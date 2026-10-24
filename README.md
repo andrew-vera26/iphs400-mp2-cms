@@ -95,6 +95,15 @@ The CMS is complete (tickets T00-T09), both exercise functions, `decide()` and `
 
 Run `uv run python scripts/check_submission.py --stage 2` before you submit.
 
+## Evidence
+
+- [Project report](docs/iphs400_mp2-web-cms_report_andrew-vera_20261024.md)
+- [Ticket-to-test map](docs/ticket-test-map.md): acceptance criteria of issues #2 to #10 with the tests that exercise them
+- [Screenshots index](docs/screenshots/README.md)
+- [Phone-width overflow check](docs/screenshots/overflow-390.md), produced by `scripts/check_phone_width.py`
+- [Usage ledger](notes/usage-ledger.csv) and [usage report script](scripts/usage_report.py)
+- [Chat transcripts](docs/transcripts/)
+
 ## Backends used
 
 | Backend | Models | Phases | Swaps |

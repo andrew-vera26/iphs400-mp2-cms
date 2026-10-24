@@ -28,7 +28,7 @@ I followed the course workflow: `/grill-with-docs`, `/to-spec`, and `/to-tickets
 | Tickets T01–T09 (implement, test, review) | 72% | 69% |
 | Final polish (admin stylesheet, 403 page, screenshots, README, deploy) | not planned | 12% |
 
-The plan held: tickets averaged 7.7% against 8% planned, with T03 the most expensive at 13% and T05 the cheapest at 3%. What I missed was work outside the tickets. The final polish cost 12%, more than any ticket except T03, and 59% of the meter was logged as "unlabelled" because I started labelling phases late. A line for polish and an earlier habit of labelling would have made the plan honest.
+The plan held: tickets averaged 7.7% against 8% planned, with T03 the most expensive at 13% and T05 the cheapest at 3%. What I missed was work outside the tickets. The final polish cost 12%, more than any ticket except T03, and 59 points of the meter, about a third of everything logged, sit under "unlabelled" because I started labelling phases late. The earliest of those rows list models I did not select, and I don't know why the status line reported them. A line for polish and an earlier habit of labelling would have made the plan honest.
 
 The thing I'd change is how I wrote the ground rules. On T02 through T05 I asked the model to "show me them failing before any implementation." It treated that as a report, not a gate. On T05 it showed a real red run (14 failed, 2 passed), implemented, and reached `/code-review` before I'd had a chance to look. The work was fine, but I could only check it after the fact. From T06 on, every prompt named stops: after the red run, after green, and before review. Next time the stops go in the first prompt.
 
