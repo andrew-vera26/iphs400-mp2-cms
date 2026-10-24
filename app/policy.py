@@ -17,6 +17,7 @@ ROLE_RULES: dict[str, frozenset[str]] = {
     "console.view": frozenset({ADMIN, EDITOR}),
     "accounts.manage": frozenset({ADMIN}),
     "trips.manage": frozenset({ADMIN}),
+    "pages.manage": frozenset({ADMIN}),
     "recaps.create": frozenset({ADMIN, EDITOR}),
     "recaps.view": frozenset({ADMIN, EDITOR}),
     "recaps.edit": frozenset({ADMIN, EDITOR}),

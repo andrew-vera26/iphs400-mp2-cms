@@ -28,6 +28,17 @@ ADMIN_ONLY_ROUTES: list[tuple[str, str]] = [
     ("POST", "/admin/recaps/1/publish"),
     ("POST", "/admin/recaps/1/unpublish"),
     ("POST", "/admin/recaps/1/send-back"),
+    # T07: Pages
+    ("GET", "/admin/pages"),
+    ("GET", "/admin/pages/new"),
+    ("GET", "/admin/pages/1"),
+    ("POST", "/admin/pages"),
+    ("POST", "/admin/pages/1"),
+    ("POST", "/admin/pages/1/delete"),
+    ("POST", "/admin/pages/1/publish"),
+    ("POST", "/admin/pages/1/unpublish"),
+    ("POST", "/admin/pages/preview"),
+    ("POST", "/admin/pages/1/preview"),
 ]
 
 

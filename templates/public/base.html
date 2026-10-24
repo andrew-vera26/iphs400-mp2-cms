@@ -7,7 +7,10 @@
   <link rel="stylesheet" href="{{ css_path }}">
 </head>
 <body>
-  <header><a href="{{ home_path }}">{{ site_title }}</a></header>
+  <header>
+    <a href="{{ home_path }}">{{ site_title }}</a>
+    <nav>{% for link in nav %}{% if not loop.first %} · {% endif %}<a href="{{ link.href }}">{{ link.title }}</a>{% endfor %}</nav>
+  </header>
   <main>{% block content %}{% endblock %}</main>
   <footer><small>Discuss the recaps on <a href="{{ instagram_url }}">Instagram</a>.</small></footer>
 </body>

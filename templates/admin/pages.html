@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block header %}{% include "admin/_header.html" %}{% endblock %}
+{% block content %}
+  <h1>Pages</h1>
+  <p><a href="/admin/pages/new">New Page</a></p>
+  <p>Show: <a href="/admin/pages">All</a> · <a href="/admin/pages?status=draft">Draft</a> · <a href="/admin/pages?status=published">Published</a></p>
+  <table>
+    <thead><tr><th>Title</th><th>Slug</th><th>Nav position</th><th>Owner</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for p in pages %}
+      <tr>
+        <td><a href="/admin/pages/{{ p.id }}">{{ p.title }}</a></td>
+        <td>{{ p.slug }}</td><td>{{ p.nav_position }}</td>
+        <td>{{ p.owner_name }}</td><td>{{ p.status | capitalize }}</td>
+        <td>
+          <form method="post" action="/admin/pages/{{ p.id }}/delete">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+            <button type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

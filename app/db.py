@@ -48,6 +48,19 @@ CREATE TABLE IF NOT EXISTS recap (
     UNIQUE (trip_id, slug)
 );
 
+CREATE TABLE IF NOT EXISTS page (
+    id           INTEGER PRIMARY KEY,
+    owner_id     INTEGER NOT NULL REFERENCES account (id),
+    title        TEXT NOT NULL,
+    slug         TEXT NOT NULL UNIQUE,
+    body         TEXT NOT NULL,
+    nav_position INTEGER NOT NULL,
+    status       TEXT NOT NULL DEFAULT 'draft'
+                 CHECK (status IN ('draft', 'published')),
+    created_at   TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    edited_at    TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+);
+
 CREATE TABLE IF NOT EXISTS image (
     id           INTEGER PRIMARY KEY,
     recap_id     INTEGER NOT NULL REFERENCES recap (id),

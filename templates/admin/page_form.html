@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block header %}{% include "admin/_header.html" %}{% endblock %}
+{% block content %}
+  <h1>{{ title }}</h1>
+  {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+  {% if page %}
+    <dl>
+      <dt>Status</dt><dd>{{ page.status | capitalize }}</dd>
+      <dt>Owner</dt><dd>{{ page.owner_name }}</dd>
+      <dt>Created</dt><dd>{{ page.created_at }}</dd>
+      <dt>Last edited</dt><dd>{{ page.edited_at }}</dd>
+    </dl>
+  {% endif %}
+  <form method="post" action="{{ action }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+    <p><label>Title <input type="text" name="title" value="{{ values.title }}" required></label></p>
+    <p><label>Slug <input type="text" name="slug" value="{{ values.slug }}" required></label></p>
+    <p><label>Nav position <input type="number" name="nav_position" value="{{ values.nav_position }}" required></label></p>
+    <p><label>Body (Markdown, text only) <textarea name="body">{{ values.body }}</textarea></label></p>
+    <p><button type="submit">Save Page</button>
+      <button type="submit" formaction="{{ action }}/preview">Preview</button> <a href="/admin/pages">Cancel</a></p>
+  </form>
+  {% if preview_html is not none %}
+    <section id="preview">{{ preview_html | safe }}</section>
+  {% endif %}
+  {% for name, label in status_actions %}
+    <form method="post" action="/admin/pages/{{ page.id }}/{{ name }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+      <button type="submit">{{ label }}</button>
+    </form>
+  {% endfor %}
+{% endblock %}
