@@ -3,3 +3,4 @@
   {{ account.name }} ({{ account.role | capitalize }}) <button type="submit">Sign out</button>
 </form>
 <nav><a href="/admin">Admin</a> · <a href="/admin/recaps">Recaps</a>{% if account.role == "admin" %} · <a href="/admin/trips">Trips</a> · <a href="/admin/accounts">Accounts</a>{% endif %}</nav>
+{% for message in take_flashes(request) %}<p role="status">{{ message }}</p>{% endfor %}

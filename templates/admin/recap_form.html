@@ -24,6 +24,16 @@
       <p><label>Byline name <input type="text" name="byline_name" value="{{ values.byline_name }}" required></label></p>
       <p><label>Byline class year <input type="number" name="byline_class_year" value="{{ values.byline_class_year }}" required></label></p>
     {% endif %}
-    <p><button type="submit">Save Recap</button> <a href="/admin/recaps">Cancel</a></p>
+    <p><button type="submit">Save Recap</button>
+      <button type="submit" formaction="{{ action }}/preview">Preview</button> <a href="/admin/recaps">Cancel</a></p>
   </form>
+  {% if preview_html is not none %}
+    <section id="preview">{{ preview_html | safe }}</section>
+  {% endif %}
+  {% for name, label in status_actions %}
+    <form method="post" action="/admin/recaps/{{ recap.id }}/{{ name }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+      <button type="submit">{{ label }}</button>
+    </form>
+  {% endfor %}
 {% endblock %}

@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS recap (
                       CHECK (status IN ('draft', 'submitted', 'published')),
     created_at        TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
     edited_at         TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    published_at      TEXT,
     UNIQUE (trip_id, slug)
 );
 """
@@ -64,6 +65,21 @@ def connect() -> Iterator[sqlite3.Connection]:
         conn.close()
 
 
+def _add_column_if_missing(conn: sqlite3.Connection, table: str, column: str,
+                           definition: str) -> None:
+    """CREATE TABLE IF NOT EXISTS never alters a table that already exists, so
+    a column added to SCHEMA later is added here for databases made before it."""
+    existing = {row["name"] for row in conn.execute(f"PRAGMA table_info({table})")}
+    if column not in existing:
+        try:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+        except sqlite3.OperationalError as exc:
+            # Another process started at the same moment and added it first.
+            if "duplicate column name" not in str(exc):
+                raise
+
+
 def init_db() -> None:
     with connect() as conn:
         conn.executescript(SCHEMA)
+        _add_column_if_missing(conn, "recap", "published_at", "TEXT")

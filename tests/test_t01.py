@@ -24,6 +24,10 @@ ADMIN_ONLY_ROUTES: list[tuple[str, str]] = [
     ("POST", "/admin/trips"),
     ("POST", "/admin/trips/1"),
     ("POST", "/admin/trips/1/delete"),
+    # T04: Recap status machine
+    ("POST", "/admin/recaps/1/publish"),
+    ("POST", "/admin/recaps/1/unpublish"),
+    ("POST", "/admin/recaps/1/send-back"),
 ]
 
 
