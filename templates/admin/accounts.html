@@ -3,7 +3,7 @@
 {% block content %}
   <h1>Accounts</h1>
   {% if error %}<p role="alert">{{ error }}</p>{% endif %}
-  <p><a href="/admin/accounts/new">New Account</a></p>
+  <p><a href="{{ admin_url('accounts/new') }}">New Account</a></p>
   <div class="table-scroll">
   <table>
     <thead><tr><th>Name</th><th>Email</th><th>Class</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>

@@ -25,7 +25,7 @@
       <p><label>Byline class year <input type="number" name="byline_class_year" value="{{ values.byline_class_year }}" required></label></p>
     {% endif %}
     <p><button type="submit">Save Recap</button>
-      <button type="submit" formaction="{{ action }}/preview">Preview</button> <a href="/admin/recaps">Cancel</a></p>
+      <button type="submit" formaction="{{ action }}/preview">Preview</button> <a href="{{ admin_url('recaps') }}">Cancel</a></p>
   </form>
   {% if preview_html is not none %}
     <section id="preview">{{ preview_html | safe }}</section>
@@ -36,7 +36,7 @@
       {% if snippet %}<p>Paste into the Body: <code id="snippet">{{ snippet }}</code></p>{% endif %}
       <ul>
         {% for image in images %}
-          <li><img src="/admin/recaps/{{ recap.id }}/images/{{ image.filename }}" alt="{{ image.alt }}" width="120">
+          <li><img src="{{ admin_url('recaps/' ~ recap.id ~ '/images/' ~ image.filename) }}" alt="{{ image.alt }}" width="120">
             {{ image.alt }}
             {% if can_edit_images %}
               <form method="post" action="/admin/recaps/{{ recap.id }}/images/{{ image.id }}/delete">

@@ -4,7 +4,7 @@ Andrew Vera · 24 October 2026 · Repo: https://github.com/andrew-vera26/iphs400
 
 ## 1. What I built, and which grill decisions were mine
 
-I built a content management system for the Kenyon Model UN club. Members write trip recaps in a FastAPI and SQLite console, officers publish them, and `cms publish` followed by `cms deploy` renders a static site to GitHub Pages. Recaps move from Draft to Submitted to Published, and the suite has 531 tests. The full feature list is in the README.
+I built a content management system for the Kenyon Model UN club. Members write trip recaps in a FastAPI and SQLite console, officers publish them, and `cms publish` followed by `cms deploy` renders a static site to GitHub Pages. Recaps move from Draft to Submitted to Published, and the suite has 537 tests. The full feature list is in the README.
 
 Three grill decisions were mine. The model's first design let only Admins log in, which would have meant chasing the President across campus to enter every recap. I reversed it. Editors now log in on the President's laptop at Sunday meetings, and I recorded that in ADR-003. I also set the permission rule that Editors see and change only their own Recaps while Admins alone publish, and I ruled out Account reactivation and email password reset.
 
@@ -14,11 +14,13 @@ The clearest drift was on T04, the Markdown sanitizer. The spec says it strips a
 
 Two other things surfaced. On T01 the model wrote implementation before showing a failing test, and I only found out by asking it directly. Later, `/code-review`, which compares the diff to the spec, found that an Editor's save could land after an Admin had Published the Recap (fixed with a status-guarded UPDATE), and that `cms backup` of a missing database wrote an empty archive.
 
+One more catch came late. While mapping each ticket's acceptance criteria to tests, a scan I wrote found four role checks inside the route code, even though ticket #2 says all role checks live in the policy module. The suite had passed the whole time because no test looked for them. I moved the four checks into the policy module with no change in behavior, and the scan is now a test.
+
 The bug I remember best is a small one. `.env.example` had an unquoted `CMS_SITE_TITLE` containing spaces. `uv run --env-file` couldn't parse that line and silently dropped every variable after it, so the seed script exited asking for `CMS_ADMIN_PASSWORD`. My tests had passed the values through the environment and never ran the documented command, so they never saw it. Running that command against a fresh clone did.
 
 ## 3. Skills, prompts, and resources
 
-I followed the course workflow: `/grill-with-docs`, `/to-spec`, and `/to-tickets` on Opus 5.5, then nine tickets on Sonnet 5.5 at medium effort. Each ticket ran the same loop: `/clear`, `/implement` with `/tdd` (tests red before any code), `/code-review` in a fresh subagent, the findings posted on the GitHub issue, then a closing commit that names every file. I also used research subagents for the WordPress field notes, `/clear` between tickets, one manual `/compact`, and one handoff. I kept tickets small enough for one fresh session, which cost me some setup time per ticket but meant the model never worked from a stale, crowded context.
+I followed the course workflow: `/grill-with-docs`, `/to-spec`, and `/to-tickets` on Opus 5.5, then nine tickets on Sonnet 5.5 at medium effort. Each ticket ran the same loop: `/clear`, `/implement` with `/tdd` (tests red before any code), `/code-review` in a fresh subagent, the findings posted on the GitHub issue, then a closing commit that names every file. I also used research subagents for the WordPress field notes, `/clear` between tickets, one manual `/compact`, and one handoff. After the last ticket I graded the repo against the instructor's own rubric (Part II, the judge prompts) in a fresh session. It caught placeholders left in my field notes, a few criteria that had no direct test, and secrets that had ended up in two session transcripts, which I redacted before committing. I kept tickets small enough for one fresh session, which cost me some setup time per ticket but meant the model never worked from a stale, crowded context.
 
 ## 4. What I would add next, and what the budget showed
 
@@ -36,4 +38,4 @@ Next I would add a Deploy button in the console (it is terminal-only now), accou
 
 ## Note on the submission check
 
-`check_submission.py` reports a failure for root-absolute paths in eleven console templates (`templates/admin/` and the console's base template). Those links (`/admin/...`) are correct because the console is served from the root and never published. The rubric rules (S1.7, F2, T6) concern the published site, where the tests and a grep over the rendered `site/` find none. I left the script unchanged and explain the failure here instead.
+`check_submission.py` first reported a failure for root-absolute paths in eleven console templates (`templates/admin/` and the console's base template). I judged those links harmless, because the console is served from the root and never published, and I left the check as it was. The instructor's MP2plus manual says admin templates count, so I was wrong to leave them. I changed the links to go through `url_for` and a small `admin_url()` helper. The rendered links are the same as before, and a test now scans the templates for the same two patterns the checker uses.

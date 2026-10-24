@@ -204,3 +204,20 @@ def test_every_admin_only_or_state_changing_route_is_in_a_table():
     assert admin_only <= in_editor_table
     assert not admin_only & set(EDITOR_ALLOWED_ROUTES)
     assert set(EDITOR_ALLOWED_ROUTES) <= set(templates), "stale allowed entry"
+
+
+# ---- no root-absolute paths in any template --------------------------------
+
+def test_no_template_has_a_root_absolute_href_or_src():
+    """The same two patterns as scripts/check_submission.py, on every tracked
+    template, so the submission check cannot fail on a console template."""
+    import subprocess
+    tracked = subprocess.run(["git", "ls-files", "templates/*.html",
+                              "templates/**/*.html"], cwd=ROOT,
+                             capture_output=True, text=True, check=True)
+    paths = sorted(set(tracked.stdout.split()))
+    assert paths, "no tracked templates found"
+    bad = [f"{p}:{n}" for p in paths
+           for n, line in enumerate((ROOT / p).read_text().splitlines(), 1)
+           if 'href="/' in line or 'src="/' in line]
+    assert not bad, "root-absolute href/src:\n" + "\n".join(bad)

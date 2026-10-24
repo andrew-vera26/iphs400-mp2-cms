@@ -2,7 +2,7 @@
 {% block header %}{% include "admin/_header.html" %}{% endblock %}
 {% block content %}
   <h1>Recaps</h1>
-  <p><a href="/admin/recaps/new">New Recap</a></p>
+  <p><a href="{{ admin_url('recaps/new') }}">New Recap</a></p>
   <form method="get" action="/admin/recaps">
     <label>Status
       <select name="status"><option value="">Any</option>
@@ -26,7 +26,7 @@
     <tbody>
     {% for r in recaps %}
       <tr>
-        <td><a href="/admin/recaps/{{ r.id }}">{{ r.title }}</a></td>
+        <td><a href="{{ admin_url('recaps/' ~ r.id) }}">{{ r.title }}</a></td>
         <td>{{ r.trip_name }}</td>
         <td>{{ r.byline_name }} '{{ r.byline_class_year % 100 }}</td>
         <td>{{ r.owner_name }}</td><td>{{ r.status | capitalize }}</td>

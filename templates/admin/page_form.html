@@ -18,7 +18,7 @@
     <p><label>Nav position <input type="number" name="nav_position" value="{{ values.nav_position }}" required></label></p>
     <p><label>Body (Markdown, text only) <textarea name="body">{{ values.body }}</textarea></label></p>
     <p><button type="submit">Save Page</button>
-      <button type="submit" formaction="{{ action }}/preview">Preview</button> <a href="/admin/pages">Cancel</a></p>
+      <button type="submit" formaction="{{ action }}/preview">Preview</button> <a href="{{ admin_url('pages') }}">Cancel</a></p>
   </form>
   {% if preview_html is not none %}
     <section id="preview">{{ preview_html | safe }}</section>

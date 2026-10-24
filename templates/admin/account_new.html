@@ -13,6 +13,6 @@
         {% for r in roles %}<option value="{{ r }}" {% if r == values.role %}selected{% endif %}>{{ r | capitalize }}</option>{% endfor %}
       </select></label></p>
     <p><label>Initial password <input type="password" name="password" required></label></p>
-    <p><button type="submit">Create Account</button> <a href="/admin/accounts">Cancel</a></p>
+    <p><button type="submit">Create Account</button> <a href="{{ admin_url('accounts') }}">Cancel</a></p>
   </form>
 {% endblock %}
